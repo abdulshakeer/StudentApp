@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:students/student_data.dart';
 import 'add_student_page.dart'; // Import the add_student_page.dart file
+import 'sql_helper.dart'; // Import the DatabaseHelper class
 
 void main() {
   runApp(const MyApp());
@@ -53,10 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => AddStudentPage(
-                            studentData: [],
-                          )),
+                  MaterialPageRoute(builder: (context) => AddStudentPage()),
                 );
                 // Add student functionality here
               },
@@ -68,9 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ViewDetailsPage(studentData: studentData)),
+                  MaterialPageRoute(builder: (context) => ViewDetailsPage()),
                 );
                 // View student details functionality here
               },
@@ -103,10 +99,26 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class ViewDetailsPage extends StatelessWidget {
-  final List<Map<String, dynamic>> studentData;
+class ViewDetailsPage extends StatefulWidget {
+  @override
+  _ViewDetailsPageState createState() => _ViewDetailsPageState();
+}
 
-  ViewDetailsPage({required this.studentData});
+class _ViewDetailsPageState extends State<ViewDetailsPage> {
+  late Future<List<Map<String, dynamic>>>
+      studentData; // Use a Future for loading data
+
+  @override
+  void initState() {
+    super.initState();
+    studentData = _loadStudentData();
+    print(studentData);
+  }
+
+  Future<List<Map<String, dynamic>>> _loadStudentData() async {
+    final dbHelper = DatabaseHelper();
+    return dbHelper.getAllRecords();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,11 +126,30 @@ class ViewDetailsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Student Details'),
       ),
-      body: ListView.builder(
-        itemCount: studentData.length,
-        itemBuilder: (context, index) {
-          final student = studentData[index];
-          return _buildStudentCard(student);
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: studentData,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(
+              child: Text('No student records available.'),
+            );
+          } else {
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final student = snapshot.data![index];
+                return _buildStudentCard(student);
+              },
+            );
+          }
         },
       ),
     );

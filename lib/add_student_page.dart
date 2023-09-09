@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:students/main.dart';
 import 'student_data.dart'; // Import the student data
+import 'sql_helper.dart'; // Import the DatabaseHelper class
 
 class AddStudentPage extends StatefulWidget {
-  final List<Map<String, dynamic>> studentData;
-
-  AddStudentPage({required this.studentData});
-
   @override
   _AddStudentPageState createState() => _AddStudentPageState();
 }
@@ -19,23 +16,12 @@ class _AddStudentPageState extends State<AddStudentPage> {
   TextEditingController dobController = TextEditingController();
 
   @override
-  void dispose() {
-    nameController.dispose();
-    rollNoController.dispose();
-    branchController.dispose();
-    marksController.dispose();
-    dobController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Student Details'),
+        title: Text('Add Student Details'), // Change the title
       ),
       body: SingleChildScrollView(
-        // Wrap the content in SingleChildScrollView
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
@@ -63,29 +49,32 @@ class _AddStudentPageState extends State<AddStudentPage> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Get the edited values from the controllers
                   final name = nameController.text;
                   final rollNo = rollNoController.text;
                   final branch = branchController.text;
-                  final marks = marksController.text;
+                  final marks = int.tryParse(marksController.text) ??
+                      0; // Parse marks as an integer
                   final dob = dobController.text;
 
-                  // Update the studentData list with the entered details
-                  widget.studentData.add({
+                  // Create a new record in the database
+                  final newRecord = {
                     'name': name,
                     'rollNo': rollNo,
                     'branch': branch,
                     'marks': marks,
                     'dob': dob,
-                  });
+                  };
+
+                  final dbHelper = DatabaseHelper();
+                  await dbHelper.insertRecord(newRecord);
 
                   // Navigate to the ViewDetailsPage
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          ViewDetailsPage(studentData: widget.studentData),
+                      builder: (context) => ViewDetailsPage(),
                     ),
                   );
                 },
