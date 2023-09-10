@@ -155,7 +155,7 @@ class _ViewDetailsPageState extends State<ViewDetailsPage> {
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     final student = snapshot.data![index];
-                    return _buildStudentCard(student);
+                    return _buildStudentCard(student, context);
                   },
                 );
               }
@@ -164,7 +164,7 @@ class _ViewDetailsPageState extends State<ViewDetailsPage> {
         ));
   }
 
-  Widget _buildStudentCard(Map<String, dynamic> student) {
+  Widget _buildStudentCard(Map<String, dynamic> student, BuildContext context) {
     return Card(
       elevation: 4.0,
       margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -183,14 +183,29 @@ class _ViewDetailsPageState extends State<ViewDetailsPage> {
             Text('Date of Birth: ${student['dob']}'),
           ],
         ),
-        trailing: IconButton(
-          icon: Icon(Icons.delete),
-          onPressed: () async {
-            await _deleteStudentRecord(student['id']);
-            setState(() {
-              studentData = _loadStudentData();
-            });
-          },
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.remove_red_eye), // View icon
+              onPressed: () {
+                // Show student details in a modal
+                _showStudentDetailsModal(student, context);
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.delete), // Delete icon
+              onPressed: () async {
+                // Call deleteRecord when the delete icon is pressed
+                await _deleteStudentRecord(student[
+                    'id']); // Replace 'id' with your actual ID field name
+                // Reload the studentData after deletion
+                setState(() {
+                  studentData = _loadStudentData();
+                });
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -200,4 +215,45 @@ class _ViewDetailsPageState extends State<ViewDetailsPage> {
 Future<void> _deleteStudentRecord(int id) async {
   final dbHelper = DatabaseHelper();
   await dbHelper.deleteRecord(id);
+}
+
+void _showStudentDetailsModal(
+    Map<String, dynamic> student, BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          width: double.infinity, // Full screen width
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.close), // Close icon
+                    onPressed: () {
+                      Navigator.pop(context); // Close the modal
+                    },
+                  ),
+                ],
+              ),
+              Text('Name: ${student['name']}'),
+              Text('Roll No: ${student['rollNo']}'),
+              Text('Branch: ${student['branch']}'),
+              Text('Marks: ${student['marks']}'),
+              Text('Date of Birth: ${student['dob']}'),
+              SizedBox(height: 16.0),
+              // Add more student details here if needed
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
