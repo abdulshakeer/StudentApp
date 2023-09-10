@@ -122,37 +122,46 @@ class _ViewDetailsPageState extends State<ViewDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Student Details'),
-      ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: studentData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Text('No student records available.'),
-            );
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final student = snapshot.data![index];
-                return _buildStudentCard(student);
-              },
-            );
-          }
+    return WillPopScope(
+        onWillPop: () async {
+          // Navigate back to the "Main Page" when the back button is pressed
+          Navigator.popUntil(
+              context,
+              ModalRoute.withName(
+                  '/')); // Replace '/' with your main page route
+          return false; // Return false to prevent default back button behavior
         },
-      ),
-    );
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Student Details'),
+          ),
+          body: FutureBuilder<List<Map<String, dynamic>>>(
+            future: studentData,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${snapshot.error}'),
+                );
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(
+                  child: Text('No student records available.'),
+                );
+              } else {
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    final student = snapshot.data![index];
+                    return _buildStudentCard(student);
+                  },
+                );
+              }
+            },
+          ),
+        ));
   }
 
   Widget _buildStudentCard(Map<String, dynamic> student) {
