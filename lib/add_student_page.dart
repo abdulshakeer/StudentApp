@@ -14,6 +14,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
   TextEditingController branchController = TextEditingController();
   TextEditingController marksController = TextEditingController();
   TextEditingController dobController = TextEditingController();
+  TextEditingController subjectController = TextEditingController();
   DateTime? selectedDate; // Make selectedDate nullable
   bool agreedToTerms = false; // Track whether the checkbox is checked
 
@@ -57,6 +58,16 @@ class _AddStudentPageState extends State<AddStudentPage> {
                     return null;
                   },
                 ),
+                _buildDateField(
+                  labelText: 'Date of Birth',
+                  controller: dobController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Name is required';
+                    }
+                    return null;
+                  },
+                ),
                 _buildTextField(
                   labelText: 'Roll No',
                   controller: rollNoController,
@@ -78,21 +89,21 @@ class _AddStudentPageState extends State<AddStudentPage> {
                   },
                 ),
                 _buildTextField(
-                  labelText: 'Marks',
-                  controller: marksController,
+                  labelText: 'Subject',
+                  controller: subjectController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Mark is required';
+                      return 'Subject is required';
                     }
                     return null;
                   },
                 ),
-                _buildDateField(
-                  labelText: 'Date of Birth',
-                  controller: dobController,
+                _buildTextField(
+                  labelText: 'Marks(in Percentage)',
+                  controller: marksController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Name is required';
+                      return 'Mark is required';
                     }
                     return null;
                   },
@@ -152,6 +163,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
                       final branch = branchController.text;
                       final marks = int.tryParse(marksController.text) ?? 0;
                       final dob = dobController.text;
+                      final subject = subjectController.text;
 
                       final newRecord = {
                         'name': name,
@@ -159,8 +171,8 @@ class _AddStudentPageState extends State<AddStudentPage> {
                         'branch': branch,
                         'marks': marks,
                         'dob': dob,
+                        'subject': subject
                       };
-
                       final dbHelper = DatabaseHelper();
                       await dbHelper.insertRecord(newRecord);
 

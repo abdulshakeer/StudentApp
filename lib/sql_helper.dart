@@ -18,7 +18,7 @@ class DatabaseHelper {
   }
 
   Future<Database> initDatabase() async {
-    String path = join(await getDatabasesPath(), 'my_database.db');
+    String path = join(await getDatabasesPath(), 'student.db');
     return await openDatabase(
       path,
       version: 1,
@@ -28,35 +28,36 @@ class DatabaseHelper {
 
   Future<void> _createDatabase(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS my_table (
+      CREATE TABLE IF NOT EXISTS student_table (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         rollNo TEXT,
         branch TEXT,
         marks INTEGER,
-        dob TEXT
+        dob TEXT,
+        subject TEXT
       )
     ''');
   }
 
   Future<int> insertRecord(Map<String, dynamic> record) async {
     final db = await database;
-    return await db.insert('my_table', record);
+    return await db.insert('student_table', record);
   }
 
   Future<List<Map<String, dynamic>>> getAllRecords() async {
     final db = await database;
-    return await db.query('my_table');
+    return await db.query('student_table');
   }
 
   Future<int> updateRecord(Map<String, dynamic> record) async {
     final db = await database;
-    return await db
-        .update('my_table', record, where: 'id = ?', whereArgs: [record['id']]);
+    return await db.update('student_table', record,
+        where: 'id = ?', whereArgs: [record['id']]);
   }
 
   Future<int> deleteRecord(int id) async {
     final db = await database;
-    return await db.delete('my_table', where: 'id = ?', whereArgs: [id]);
+    return await db.delete('student_table', where: 'id = ?', whereArgs: [id]);
   }
 }

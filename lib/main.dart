@@ -176,10 +176,11 @@ class _ViewDetailsPageState extends State<ViewDetailsPage> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            Text('Date of Birth: ${student['dob']}'),
             Text('Roll No: ${student['rollNo']}'),
             Text('Branch: ${student['branch']}'),
+            Text('Subject: ${student['subject']}'),
             Text('Marks: ${student['marks']}'),
-            Text('Date of Birth: ${student['dob']}'),
           ],
         ),
         trailing: Row(
@@ -243,10 +244,12 @@ void _showStudentDetailsModal(
                 ],
               ),
               Text('Name: ${student['name']}'),
+              Text('Date of Birth: ${student['dob']}'),
               Text('Roll No: ${student['rollNo']}'),
               Text('Branch: ${student['branch']}'),
+              Text('Subject: ${student['subject']}'),
               Text('Marks: ${student['marks']}'),
-              Text('Date of Birth: ${student['dob']}'),
+
               SizedBox(height: 16.0),
               // Add more student details here if needed
             ],
