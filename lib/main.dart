@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:students/student_data.dart';
 import 'add_student_page.dart'; // Import the add_student_page.dart file
 import 'sql_helper.dart'; // Import the DatabaseHelper class
 
