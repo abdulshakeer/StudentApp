@@ -183,7 +183,21 @@ class _ViewDetailsPageState extends State<ViewDetailsPage> {
             Text('Date of Birth: ${student['dob']}'),
           ],
         ),
+        trailing: IconButton(
+          icon: Icon(Icons.delete),
+          onPressed: () async {
+            await _deleteStudentRecord(student['id']);
+            setState(() {
+              studentData = _loadStudentData();
+            });
+          },
+        ),
       ),
     );
   }
+}
+
+Future<void> _deleteStudentRecord(int id) async {
+  final dbHelper = DatabaseHelper();
+  await dbHelper.deleteRecord(id);
 }
