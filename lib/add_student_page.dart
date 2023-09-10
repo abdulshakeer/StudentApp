@@ -15,6 +15,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
   TextEditingController marksController = TextEditingController();
   TextEditingController dobController = TextEditingController();
   DateTime? selectedDate; // Make selectedDate nullable
+  bool agreedToTerms = false; // Track whether the checkbox is checked
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -97,9 +98,55 @@ class _AddStudentPageState extends State<AddStudentPage> {
                   },
                 ),
                 SizedBox(height: 20),
+                FormField<bool>(
+                  builder: (state) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Checkbox(
+                              value: agreedToTerms,
+                              onChanged: (value) {
+                                setState(() {
+                                  agreedToTerms = value ?? false;
+                                  state.didChange(value);
+                                });
+                              },
+                            ),
+                            Text('I agree to the terms and conditions'),
+                          ],
+                        ),
+                        if (state.errorText != null)
+                          Text(
+                            state.errorText!,
+                            style: TextStyle(color: Colors.red),
+                          ),
+                      ],
+                    );
+                  },
+                  validator: (value) {
+                    if (value == false) {
+                      return 'You must agree to the terms and conditions';
+                    }
+                    return null;
+                  },
+                ),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      if (!agreedToTerms) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Please agree to the terms and conditions',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
                       final name = nameController.text;
                       final rollNo = rollNoController.text;
                       final branch = branchController.text;
