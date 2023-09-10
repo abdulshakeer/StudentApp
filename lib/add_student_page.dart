@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:students/main.dart';
-import 'student_data.dart'; // Import the student data
 import 'sql_helper.dart'; // Import the DatabaseHelper class
 
 class AddStudentPage extends StatefulWidget {
